@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id             Int     @id @default(autoincrement())
+  name           String
+  address        String
+  phone          String
+  gstin          String
+  hsnCode        String
+  gstRate        Decimal @default(18) @db.Decimal(10, 2)
+  bankName       String
+  branch         String
+  ifsc           String
+  accountNo      String
+  lastInvoiceSeq Int     @default(0)
+  currentFY      String
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String
+  gstin     String?
+  state     String
+  phone     String?
+  createdAt DateTime @default(now())
+  bills     Bill[]
+}
+
+model Bill {
+  id         Int      @id @default(autoincrement())
+  invoiceNo  String   @unique
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+  vehicleNo  String
+  eWayBillNo String
+  dimension  String
+  rate       Decimal  @db.Decimal(10, 2)
+  quantity   Decimal  @db.Decimal(10, 2)
+  amount     Decimal  @db.Decimal(10, 2)
+  cgst       Decimal  @db.Decimal(10, 2)
+  sgst       Decimal  @db.Decimal(10, 2)
+  roundOff   Decimal  @db.Decimal(10, 2)
+  grandTotal Decimal  @db.Decimal(10, 2)
+  status     String   @default("ACTIVE")
+  pdfUrl     String?
+  createdAt  DateTime @default(now())
+}

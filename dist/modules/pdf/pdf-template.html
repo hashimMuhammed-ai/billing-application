@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tax Invoice - {{invoiceNo}}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 12mm 15mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 11pt;
+      color: #111;
+      line-height: 1.4;
+      background: #fff;
+    }
+    .invoice-container {
+      width: 100%;
+      border: 1.5px solid #000;
+      padding: 0;
+    }
+    .header-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 14pt;
+      letter-spacing: 1px;
+      padding: 6px 0;
+      border-bottom: 1.5px solid #000;
+      background-color: #f8f9fa;
+      text-transform: uppercase;
+    }
+    .company-section {
+      display: flex;
+      border-bottom: 1.5px solid #000;
+      padding: 10px 12px;
+    }
+    .company-details {
+      flex: 1;
+    }
+    .company-name {
+      font-size: 16pt;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #000;
+    }
+    .company-info-line {
+      font-size: 9.5pt;
+      color: #333;
+      margin-bottom: 2px;
+    }
+    .meta-grid {
+      display: flex;
+      border-bottom: 1.5px solid #000;
+    }
+    .meta-col {
+      flex: 1;
+      padding: 8px 12px;
+    }
+    .meta-col:first-child {
+      border-right: 1.5px solid #000;
+    }
+    .meta-row {
+      display: flex;
+      margin-bottom: 4px;
+      font-size: 9.5pt;
+    }
+    .meta-label {
+      font-weight: bold;
+      width: 120px;
+      color: #444;
+    }
+    .meta-value {
+      font-weight: 600;
+      color: #000;
+    }
+    .buyer-section {
+      border-bottom: 1.5px solid #000;
+      padding: 8px 12px;
+      background-color: #fafafa;
+    }
+    .section-label {
+      font-size: 9pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .buyer-name {
+      font-size: 11pt;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    .buyer-info-line {
+      font-size: 9.5pt;
+      margin-bottom: 2px;
+    }
+    /* Items Table */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-bottom: 1.5px solid #000;
+    }
+    .items-table th, .items-table td {
+      border-right: 1px solid #000;
+      padding: 8px;
+      font-size: 9.5pt;
+    }
+    .items-table th:last-child, .items-table td:last-child {
+      border-right: none;
+    }
+    .items-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1.5px solid #000;
+    }
+    .items-table td.text-center { text-align: center; }
+    .items-table td.text-right { text-align: right; }
+    .items-table td.text-left { text-align: left; }
+    
+    .item-row {
+      min-height: 120px;
+    }
+    
+    /* Summary / GST Breakdown */
+    .summary-section {
+      display: flex;
+      border-bottom: 1.5px solid #000;
+    }
+    .words-and-bank {
+      flex: 1.2;
+      border-right: 1.5px solid #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .amount-in-words-box {
+      padding: 8px 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    .amount-words-title {
+      font-size: 8.5pt;
+      font-weight: bold;
+      color: #555;
+      text-transform: uppercase;
+    }
+    .amount-words-text {
+      font-size: 9.5pt;
+      font-weight: bold;
+      margin-top: 2px;
+      color: #000;
+    }
+    .bank-box {
+      padding: 8px 12px;
+    }
+    .bank-title {
+      font-size: 8.5pt;
+      font-weight: bold;
+      color: #555;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .bank-grid {
+      font-size: 9pt;
+    }
+    .bank-row {
+      display: flex;
+      margin-bottom: 2px;
+    }
+    .bank-label {
+      width: 100px;
+      color: #444;
+    }
+    .bank-value {
+      font-weight: 600;
+    }
+
+    .calculation-box {
+      flex: 0.8;
+    }
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .calc-table td {
+      padding: 6px 10px;
+      font-size: 9.5pt;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .calc-table tr:last-child td {
+      border-bottom: none;
+    }
+    .calc-label {
+      text-align: left;
+    }
+    .calc-val {
+      text-align: right;
+      font-weight: 600;
+    }
+    .grand-total-row td {
+      font-weight: bold;
+      font-size: 11pt;
+      border-top: 1.5px solid #000;
+      background-color: #f8f9fa;
+    }
+
+    /* Footer / Signatory */
+    .footer-section {
+      display: flex;
+      min-height: 90px;
+    }
+    .terms-box {
+      flex: 1;
+      border-right: 1.5px solid #000;
+      padding: 8px 12px;
+      font-size: 8.5pt;
+      color: #555;
+    }
+    .terms-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #333;
+    }
+    .signatory-box {
+      flex: 1;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: right;
+    }
+    .signatory-title {
+      font-size: 9.5pt;
+      font-weight: bold;
+    }
+    .signatory-signature {
+      font-size: 9pt;
+      color: #666;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="header-title">TAX INVOICE</div>
+    
+    <div class="company-section">
+      <div class="company-details">
+        <div class="company-name">{{sellerName}}</div>
+        <div class="company-info-line">{{sellerAddress}}</div>
+        <div class="company-info-line"><strong>GSTIN:</strong> {{sellerGstin}} | <strong>Phone:</strong> {{sellerPhone}}</div>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-col">
+        <div class="meta-row">
+          <span class="meta-label">Invoice No:</span>
+          <span class="meta-value">{{invoiceNo}}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Invoice Date:</span>
+          <span class="meta-value">{{date}}</span>
+        </div>
+      </div>
+      <div class="meta-col">
+        <div class="meta-row">
+          <span class="meta-label">Vehicle No:</span>
+          <span class="meta-value">{{vehicleNo}}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">E-Way Bill No:</span>
+          <span class="meta-value">{{eWayBillNo}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="buyer-section">
+      <div class="section-label">Billed To (Buyer):</div>
+      <div class="buyer-name">{{customerName}}</div>
+      <div class="buyer-info-line">{{customerAddress}}</div>
+      <div class="buyer-info-line">
+        <strong>GSTIN:</strong> {{customerGstin}} | <strong>State:</strong> {{customerState}} {{customerPhoneSection}}
+      </div>
+    </div>
+
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width: 6%;">S.No</th>
+          <th style="width: 38%;">Description of Goods</th>
+          <th style="width: 12%;">HSN/SAC</th>
+          <th style="width: 12%;">Dimension</th>
+          <th style="width: 10%;">Qty</th>
+          <th style="width: 10%;">Rate (₹)</th>
+          <th style="width: 12%;">Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="item-row">
+          <td class="text-center">1</td>
+          <td class="text-left"><strong>Face Veneer</strong></td>
+          <td class="text-center">{{hsnCode}}</td>
+          <td class="text-center">{{dimension}}</td>
+          <td class="text-right">{{quantity}}</td>
+          <td class="text-right">{{rate}}</td>
+          <td class="text-right">{{amount}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="summary-section">
+      <div class="words-and-bank">
+        <div class="amount-in-words-box">
+          <div class="amount-words-title">Total Invoice Amount in Words</div>
+          <div class="amount-words-text">INR {{grandTotalInWords}} Only</div>
+        </div>
+        <div class="bank-box">
+          <div class="bank-title">Bank Details for Payment</div>
+          <div class="bank-grid">
+            <div class="bank-row"><span class="bank-label">Bank:</span><span class="bank-value">{{bankName}}</span></div>
+            <div class="bank-row"><span class="bank-label">Branch:</span><span class="bank-value">{{bankBranch}}</span></div>
+            <div class="bank-row"><span class="bank-label">A/c No:</span><span class="bank-value">{{bankAccountNo}}</span></div>
+            <div class="bank-row"><span class="bank-label">IFSC:</span><span class="bank-value">{{bankIfsc}}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="calculation-box">
+        <table class="calc-table">
+          <tr>
+            <td class="calc-label">Sub Total</td>
+            <td class="calc-val">₹{{amount}}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">CGST ({{cgstRate}}%)</td>
+            <td class="calc-val">₹{{cgst}}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">SGST ({{sgstRate}}%)</td>
+            <td class="calc-val">₹{{sgst}}</td>
+          </tr>
+          <tr>
+            <td class="calc-label">Round Off</td>
+            <td class="calc-val">{{roundOffSign}}₹{{roundOff}}</td>
+          </tr>
+          <tr class="grand-total-row">
+            <td class="calc-label">Grand Total</td>
+            <td class="calc-val">₹{{grandTotal}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-section">
+      <div class="terms-box">
+        <div class="terms-title">Terms & Conditions:</div>
+        <ol style="padding-left: 14px;">
+          <li>Goods once sold will not be taken back.</li>
+          <li>Subject to local jurisdiction.</li>
+        </ol>
+      </div>
+      <div class="signatory-box">
+        <div class="signatory-title">For {{sellerName}}</div>
+        <div class="signatory-signature">Authorized Signatory</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
